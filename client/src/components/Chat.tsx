@@ -10,6 +10,7 @@ import { useTheme } from './ThemeProvider';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLastAreaPreference } from '@/hooks/useLastAreaPreference';
 import { queryClient, apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/useAuth';
 import { 
@@ -57,6 +58,7 @@ const segmentsToString = (segments: StreamSegment[]): string =>
     .join('');
 
 export function Chat() {
+  useLastAreaPreference('user');
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     if (typeof window === 'undefined') {
       return true;

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useLastAreaPreference } from '@/hooks/useLastAreaPreference';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sparkles, Users, Shield, Bot, Star } from "lucide-react";
@@ -14,6 +15,7 @@ interface ExpertsResponse {
 }
 
 export default function ExpertsPage() {
+  useLastAreaPreference('user');
   const [, navigate] = useLocation();
   const { data: expertsData, isLoading } = useQuery<ExpertsResponse>({
     queryKey: ['/api/experts'],

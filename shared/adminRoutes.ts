@@ -123,6 +123,23 @@ const ADMIN_ROUTE_CATALOG: Record<string, AdminRouteDefinition> = {
       },
     },
   },
+  'models-catalog': {
+    id: 'models-catalog',
+    label: 'Model Catalog & Pricing',
+    path: '/admin/models',
+    requiredPermission: PERMISSIONS.MODELS_CATALOG_VIEW,
+    apis: [
+      { method: 'GET', path: '/api/admin/models' },
+      { method: 'POST', path: '/api/admin/models' },
+      { method: 'PATCH', path: '/api/admin/models/:id' },
+      { method: 'DELETE', path: '/api/admin/models/:id' },
+    ],
+    groupId: 'system-policies',
+    pageHeader: {
+      title: 'Model Catalog & Pricing',
+      description: 'Manage models, capabilities, and pricing visibility.',
+    },
+  },
   plans: {
     id: 'plans',
     label: 'Plans & Models',
@@ -366,7 +383,7 @@ export const ADMIN_ROUTE_GROUPS: readonly AdminRouteGroupDefinition[] = [
     label: 'System & Policies',
     icon: 'Settings',
     requiredPermission: PERMISSIONS.SYSTEM_PROMPTS_VIEW,
-    routeIds: ['system-prompts', 'output-templates', 'tool-policies'],
+    routeIds: ['system-prompts', 'output-templates', 'tool-policies', 'models-catalog'],
   },
   {
     id: 'plans-features',
@@ -464,4 +481,3 @@ export function getAdminRouteGroupById(
 }
 
 export { ADMIN_ROUTE_CATALOG };
-

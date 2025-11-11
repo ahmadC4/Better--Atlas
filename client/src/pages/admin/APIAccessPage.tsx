@@ -1,5 +1,7 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import { useAdminSettings } from '@/hooks/use-admin-settings';
+import { useAdminLayout } from '@/components/AdminLayout';
+import { getAdminRouteById } from '@shared/adminRoutes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +12,12 @@ import { AI_MODELS } from '@shared/schema';
 import type { AIModel, ProviderSettings } from '@shared/schema';
 
 export default function APIAccessPage() {
+  const { setHeader, resetHeader } = useAdminLayout();
+  const routeMeta = getAdminRouteById('api-access');
+  useEffect(() => {
+    setHeader({ title: routeMeta.pageHeader?.title ?? routeMeta.label, description: routeMeta.pageHeader?.description });
+    return () => resetHeader();
+  }, [setHeader, resetHeader]);
   const { draft, setDraft, isLoading, isSaving, handleSave } = useAdminSettings();
 
   const providerModelMap = useMemo(() => {

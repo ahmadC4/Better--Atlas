@@ -7,8 +7,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/use-permissions';
 import { PERMISSIONS } from '@shared/constants';
 import AdminToolPoliciesCard from '@/components/admin/AdminToolPoliciesCard';
+import { useAdminLayout } from '@/components/AdminLayout';
+import { getAdminRouteById } from '@shared/adminRoutes';
 
 export default function ToolPoliciesPage() {
+  const { setHeader, resetHeader } = useAdminLayout();
+  const routeMeta = getAdminRouteById('tool-policies');
+  useEffect(() => {
+    setHeader({ title: routeMeta.pageHeader?.title ?? routeMeta.label, description: routeMeta.pageHeader?.description });
+    return () => resetHeader();
+  }, [setHeader, resetHeader]);
   const { isAdmin, isLoading: isAuthLoading } = useAuth();
   const { canEdit } = usePermissions();
   const [, setLocation] = useLocation();

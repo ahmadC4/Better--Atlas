@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useLastAreaPreference } from '@/hooks/useLastAreaPreference';
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { ChevronLeft, Cloud, FileText, Download, Loader2, CloudOff } from 'lucide-react';
@@ -25,6 +26,7 @@ interface DriveFilesResponse {
 }
 
 export default function GoogleDrivePage() {
+  useLastAreaPreference('user');
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<DriveFile | null>(null);

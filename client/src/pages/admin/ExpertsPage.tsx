@@ -14,8 +14,16 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { apiRequest } from '@/lib/queryClient';
 import type { AdminExpert, AdminExpertsResponse } from './types';
+import { useAdminLayout } from '@/components/AdminLayout';
+import { getAdminRouteById } from '@shared/adminRoutes';
 
 export default function ExpertsPage() {
+  const { setHeader, resetHeader } = useAdminLayout();
+  const routeMeta = getAdminRouteById('expert-library');
+  useEffect(() => {
+    setHeader({ title: routeMeta.pageHeader?.title ?? routeMeta.label, description: routeMeta.pageHeader?.description });
+    return () => resetHeader();
+  }, [setHeader, resetHeader]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAdmin, isLoading: isAuthLoading } = useAuth();

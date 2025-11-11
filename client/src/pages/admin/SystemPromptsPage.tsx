@@ -17,8 +17,16 @@ import { apiRequest } from '@/lib/queryClient';
 import { DEFAULT_SYSTEM_PROMPT, PERMISSIONS } from '@shared/constants';
 import { usePermissions } from '@/hooks/use-permissions';
 import type { AdminSystemPrompt, AdminSystemPromptListResponse, AdminSystemPromptMutationResponse } from './types';
+import { useAdminLayout } from '@/components/AdminLayout';
+import { getAdminRouteById } from '@shared/adminRoutes';
 
 export default function SystemPromptsPage() {
+  const { setHeader, resetHeader } = useAdminLayout();
+  const routeMeta = getAdminRouteById('system-prompts');
+  useEffect(() => {
+    setHeader({ title: routeMeta.pageHeader?.title ?? routeMeta.label, description: routeMeta.pageHeader?.description });
+    return () => resetHeader();
+  }, [setHeader, resetHeader]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAdmin, user, isLoading: isAuthLoading } = useAuth();

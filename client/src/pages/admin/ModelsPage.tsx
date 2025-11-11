@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Plus, Edit2, Trash2, DollarSign, Eye, EyeOff, Code, Search, Mic, Image, MessageSquare, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminLayout } from '@/components/AdminLayout';
+import { getAdminRouteById } from '@shared/adminRoutes';
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Model, ModelCapabilities, ModelPricing } from "@shared/schema";
 
@@ -43,6 +45,12 @@ const capabilityIcons = {
 };
 
 export default function ModelsPage() {
+  const { setHeader, resetHeader } = useAdminLayout();
+  const routeMeta = getAdminRouteById('models-catalog');
+  useEffect(() => {
+    setHeader({ title: routeMeta.pageHeader?.title ?? routeMeta.label, description: routeMeta.pageHeader?.description });
+    return () => resetHeader();
+  }, [setHeader, resetHeader]);
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingModel, setEditingModel] = useState<ModelWithDates | null>(null);

@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { useLastAreaPreference } from '@/hooks/useLastAreaPreference';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import {
@@ -80,6 +81,7 @@ const percentageFormatter = new Intl.NumberFormat('en-US', {
 type RangeOption = '7d' | '30d' | 'all';
 
 export default function UsagePage() {
+  useLastAreaPreference('user');
   const [dateRange, setDateRange] = useState<RangeOption>('7d');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();

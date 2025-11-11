@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useAdminLayout } from '@/components/AdminLayout';
+import { getAdminRouteById } from '@shared/adminRoutes';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { Users, Loader2, ChevronDown } from 'lucide-react';
@@ -38,6 +40,12 @@ const normalizePlanSlug = (value?: string | null): string => {
 };
 
 export default function UsersPage() {
+  const { setHeader, resetHeader } = useAdminLayout();
+  const routeMeta = getAdminRouteById('user-management');
+  useEffect(() => {
+    setHeader({ title: routeMeta.pageHeader?.title ?? routeMeta.label, description: routeMeta.pageHeader?.description });
+    return () => resetHeader();
+  }, [setHeader, resetHeader]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user: currentUser, isAdmin, isLoading: isAuthLoading } = useAuth();
