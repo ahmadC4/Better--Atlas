@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/public",
+  "rewrites": [
+    { "source": "/health", "destination": "/api/health" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    {
+      "source": "/((?!api/|assets/|favicon\\.ico|robots\\.txt|manifest.*|.*\\.(?:js|css|map|png|jpg|jpeg|gif|svg|ico|json|txt|webp|woff|woff2|ttf|otf)).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
