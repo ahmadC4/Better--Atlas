@@ -27,7 +27,7 @@ import SystemPromptsPage from "@/pages/admin/SystemPromptsPage";
 import OutputTemplatesPage from "@/pages/admin/OutputTemplatesPage";
 import ToolPoliciesPage from "@/pages/admin/ToolPoliciesPage";
 import ModelsPage from "@/pages/admin/ModelsPage";
-import { PlansManagementPage } from "@/pages/admin/PlansManagementPage";
+import PlansPage from "@/pages/admin/PlansPage";
 import PricingPage from "@/pages/pricing";
 import KnowledgeBase from "@/pages/KnowledgeBase";
 import KnowledgeBasePage from "@/pages/admin/KnowledgeBasePage";
@@ -46,7 +46,7 @@ const ADMIN_ROUTES = [
   { path: "/admin/output-templates", Component: OutputTemplatesPage },
   { path: "/admin/tool-policies", Component: ToolPoliciesPage },
   { path: "/admin/models", Component: ModelsPage },
-  { path: "/admin/plans", Component: PlansManagementPage },
+  { path: "/admin/plans", Component: PlansPage },
   { path: "/admin/pricing", Component: PricingPage },
   { path: "/admin/knowledge-base", Component: KnowledgeBasePage },
   { path: "/admin/memory", Component: MemoryPage },
@@ -95,6 +95,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Chat} />
+      <Route path="/app" component={Chat} />
       <Route path="/usage" component={UsagePage} />
       <Route path="/experts" component={ExpertsPage} />
       <Route path="/templates" component={TemplatesPage} />

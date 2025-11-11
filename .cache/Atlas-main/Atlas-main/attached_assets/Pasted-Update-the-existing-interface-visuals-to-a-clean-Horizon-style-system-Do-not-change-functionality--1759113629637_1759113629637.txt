@@ -1,0 +1,170 @@
+Update the existing interface visuals to a clean, Horizon-style system. Do not change functionality or content—only visual presentation.
+
+Objectives
+	•	Establish a consistent type scale, color system, spacings, radii, shadows, and states.
+	•	Unify buttons, inputs, cards, chat bubbles, sidebar, and topbar to one coherent look.
+	•	Provide light + dark variants for all surfaces and text.
+
+⸻
+
+1) Typography (use throughout)
+	•	Primary font: DM Sans (all UI/body).
+	•	Accent/optional headings: Poppins (large headings only if needed).
+	•	Sizes/weights/leading (desktop):
+	•	H1 hero: 56–64 px, semibold, leading-tight
+	•	H2: 32 px, semibold
+	•	H3: 24 px, medium
+	•	Body: 16 px, regular, leading-relaxed
+	•	Small/meta: 13–14 px, regular, leading-snug
+	•	Tracking: neutral (no excessive letter-spacing).
+	•	Text rendering: antialiased.
+
+⸻
+
+2) Color System (semantic)
+	•	Brand: brand/500, 600, 700 (primary CTAs & highlights)
+	•	Text:
+	•	Light: text/strong (near-black navy), text/muted (cool gray)
+	•	Dark: text/strong (near-white), text/muted (gray-300)
+	•	Surfaces:
+	•	Light: surface/base (white), surface/subtle (gray-50/100)
+	•	Dark: surface/base (navy-800/900), surface/subtle (navy-700)
+	•	Borders:
+	•	Light: border/neutral (gray-200)
+	•	Dark: border/neutral (navy-700)
+	•	Feedback:
+	•	Success green/500, Warning amber/500, Danger red/500, Info blue/500
+	•	Keep contrast AA+ for text on surfaces.
+
+(If you need concrete hexes, pick a deep indigo for brand, a navy text set, and neutral grays; ensure the 500/600/700 steps are clearly darker.)
+
+⸻
+
+3) Spacing & Layout Rhythm
+	•	Base unit: 4px grid.
+	•	Common blocks: 8, 12, 16, 20, 24, 32 px.
+	•	Page gutters: 24–32 px.
+	•	Section vertical rhythm: 32–48 px.
+	•	Component padding:
+	•	Buttons: px 20, py 12 (md)
+	•	Inputs: px 16, py 12
+	•	Cards: 24 px all sides
+	•	Gaps: small lists 8–12 px, complex layouts 16–24 px.
+
+⸻
+
+4) Corners & Elevation
+	•	Border radius: default 12 px (aka “rounded-xl” feel).
+	•	Special:
+	•	Pills / circular elements: full radius
+	•	Chat bubbles: 20–24 px with one corner slightly sharper for direction.
+	•	Shadows:
+	•	Resting card: soft medium shadow (blur ~24–32, low opacity).
+	•	Hovered interactive: slightly stronger shadow + subtle lift (y-offset +2–3).
+
+⸻
+
+5) Buttons (visual rules)
+	•	Primary (brand):
+	•	Background: brand/500; Hover: brand/600; Active: brand/700
+	•	Text: white; Weight: medium
+	•	Corners: 12 px; Padding: 20×12
+	•	Focus: 2px glow in brand tint
+	•	Secondary (neutral fill):
+	•	Background: surface/subtle; Hover: slightly darker subtle
+	•	Text: text/strong
+	•	Border: none or very light neutral
+	•	Tertiary / Ghost (text button):
+	•	Transparent background; brand text; subtle hover background tint
+	•	Icon buttons:
+	•	Circular, full radius, 8–10 px internal padding
+	•	Disabled:
+	•	Reduce contrast by 40–50%, remove shadow, keep layout unchanged.
+
+⸻
+
+6) Inputs, Selects, Textareas
+	•	Background: light mode white; dark mode navy-800
+	•	Border: neutral hairline (gray-200 / navy-700)
+	•	Radius: 12 px; Shadow: subtle (or none by default)
+	•	Focus: brand border + soft glow; never jumpy.
+	•	Placeholder: muted text color; do not exceed body contrast.
+	•	Inline help/error: 13–14 px; use semantic colors (danger/warning).
+
+⸻
+
+7) Cards & Panels
+	•	Surfaces: white (light), navy-800 (dark)
+	•	Radius: 12 px; Padding: 24 px; Shadow: soft medium
+	•	Header: title (H3), optional meta; Divider: neutral border
+	•	States: hover = slight lift; selected = subtle brand outline or tint.
+
+⸻
+
+8) Chat Experience (key visuals)
+	•	Message bubbles:
+	•	User (right): brand background, white text, 20–24 px radius, slightly sharper bottom-right corner.
+	•	AI (left): subtle surface (gray-50 / navy-800), dark text, 20–24 px radius, slightly sharper bottom-left corner.
+	•	Message spacing: 8–12 px within a cluster; 16–24 px between clusters.
+	•	Composer:
+	•	Container: surface card with 12–16 px radius, light border, subtle shadow
+	•	Controls: primary send, ghost attach/voice, clear focus states
+	•	Markdown:
+	•	Headings follow type scale; lists have 8–12 px vertical rhythm
+	•	Code blocks: high-contrast mono area with 10–12 px radius and horizontal scroll
+	•	System/meta rows: use muted text + hairline dividers.
+
+⸻
+
+9) Navigation (Sidebar & Topbar)
+	•	Sidebar:
+	•	Width: 260–288 px
+	•	Item visual: 10–12 px radius; hover = subtle tint; active = brand tint + left accent (2–3 px)
+	•	Sections: label (small, muted), items grouped with 8–12 px gaps
+	•	Topbar:
+	•	Compact height, subtle shadow when content scrolls
+	•	Left: product / page title; Right: theme toggle, profile, quick actions
+
+⸻
+
+10) Motion & States
+	•	Transitions: 150–200 ms for color/opacity/transform
+	•	Hover: color deepen + slight elevation (cards/buttons)
+	•	Focus: visible outline (brand glow), not just color
+	•	Pressed: reduce elevation, deepen color by one step
+	•	Skeletons: use subtle neutral shimmer for loading.
+
+⸻
+
+11) Iconography & Imagery
+	•	Icons: clean, geometric; consistent stroke weight
+	•	Sizes: 16, 20, 24 px standard; align to 4 px grid
+	•	Avatars: circular, 24/32/40 px with 1 px border on dark surfaces.
+
+⸻
+
+12) Dark Mode Parity
+	•	Every component must have a dark counterpart:
+	•	Text becomes near-white; muted text shifts to gray-300
+	•	Surfaces shift to navy-800/900
+	•	Borders shift to navy-700
+	•	Keep brand hue consistent (only adjust brightness for contrast).
+
+⸻
+
+13) Deliverables (design-only)
+	•	Style Tokens: fonts, sizes, weights, colors (brand/text/surface/border), spacings, radii, shadows.
+	•	Component Spec Sheets: buttons, inputs, cards, chat bubbles, sidebar/topbar, tags/badges.
+	•	State Map: default, hover, focus, active, disabled (light & dark).
+	•	UI Checklist: contrast checks, consistent paddings, alignment to 4 px grid.
+
+Constraints
+	•	Do not alter copy or functionality.
+	•	Keep layout structure; only refine visuals.
+	•	Maintain accessibility contrast (WCAG AA+).
+
+Success Criteria
+	•	Visual cohesion across all components
+	•	Clear hierarchy via type + spacing
+	•	Crisp states, smooth motion, strong readability in both themes
+	•	Buttons/inputs/cards look “of the same family” across the app.

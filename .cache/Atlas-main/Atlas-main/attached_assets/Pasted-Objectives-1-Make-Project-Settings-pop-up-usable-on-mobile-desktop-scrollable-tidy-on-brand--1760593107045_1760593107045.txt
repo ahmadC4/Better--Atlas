@@ -1,0 +1,149 @@
+Objectives
+	1.	Make Project Settings pop-up usable on mobile & desktop (scrollable, tidy, on-brand).
+	2.	Fix sidebar overflow so long sections (Templates, AI Agents, etc.) never get cut off.
+	3.	Make Templates and AI Experts actually usable by end users in chats.
+	4.	Add a simple AI Agent webhook connector (for n8n) so agents can be tested and used from Atlas.
+
+⸻
+
+A) Project Settings pop-up: usability + brand polish
+
+Problems to fix
+	•	Not scrollable; “Save” button falls outside the modal.
+	•	Modal is too wide/boxy; typography inconsistent with brand.
+	•	The user-entered text style looks larger/different than system text.
+
+Implement
+	•	Constrain modal width to a readable max (≈ 640–720px desktop; 100% minus safe margins on mobile).
+	•	Make modal vertically scrollable with a sticky header (title + tabs) and sticky footer (primary/secondary actions).
+	•	Normalize typography: use brand body size for user text inputs; system labels one size smaller; consistent line height.
+	•	Tabs: General / Instructions / Knowledge / Share remain; ensure tab content area scrolls within the modal.
+	•	Primary button text: Save (contextualize per tab automatically: Save Instructions, Save Settings).
+	•	Button placement: right-aligned, inside the modal footer, never off-screen.
+
+Acceptance
+	•	On mobile and desktop, the entire modal stays in the viewport.
+	•	The content area scrolls; the Save button is always visible.
+	•	User-entered text uses brand body style (no oversized text).
+	•	Saving shows a brief success toast, then focuses the first field next time the modal opens.
+
+⸻
+
+B) Sidebar: overflow, cut-offs, and long lists
+
+Problems to fix
+	•	When multiple sections are expanded (Templates, AI Agents, etc.), items are cut off or misaligned.
+
+Implement
+	•	Sidebar has its own scroll independent of the page.
+	•	Each section collapses/expands; only one expanded at a time by default (configurable).
+	•	Long lists paginate or lazy-load (show 25 items, then Load more).
+	•	Ensure truncation with ellipsis for long names; full name shows on hover tooltip.
+	•	Keep section headers sticky inside the sidebar for quick collapse.
+
+Acceptance
+	•	No cut-offs at any screen size.
+	•	Expanding several sections keeps everything readable via sidebar scroll.
+	•	Long names don’t break layout (ellipsis + tooltip).
+	•	Keyboard navigation (Tab/Arrow) can reach all items.
+
+⸻
+
+C) Templates: make them usable in chat
+
+Problems to fix
+	•	Can’t click, download, or “use in chat.”
+
+Implement
+	•	Template card/list actions:
+	•	Use in Chat → opens a chooser: Start New Chat OR Apply to Current Chat.
+	•	Download → exports the template JSON/Markdown.
+	•	Preview → shows a small modal with the required sections and sample output.
+	•	In chat composer: add a Template dropdown (recent/Starred first).
+	•	When a template is active, show a chip “Template: {name}” with an X to clear.
+	•	Save the selected template in the conversation metadata so it persists across reloads.
+	•	If a template requires sections, show a light validation result after the AI replies (pass/fail with missing sections listed).
+
+Acceptance
+	•	User can apply a template to a brand-new chat or the current chat with one click.
+	•	After applying, the template chip is visible in the composer.
+	•	Download returns a real file; Preview displays the template content.
+	•	Post-reply validation correctly flags missing sections when applicable.
+
+⸻
+
+D) AI Experts: usable by end users
+
+Problems to fix
+	•	Experts exist but can’t be used directly in chat.
+
+Implement
+	•	Expert card/list actions:
+	•	Use in Chat → same chooser as Templates (New Chat / Current Chat).
+	•	View Details → brief summary of role, scope, and non-goals.
+	•	In chat composer: add Expert dropdown (shows Experts visible to this user).
+	•	Show chip “Expert: {name}” beside Template chip; allow quick switch/clear.
+	•	Experts are defined by Super Admin; Admin/User can use but not edit.
+
+Acceptance
+	•	User can select an Expert and immediately chat “as that expert.”
+	•	The selected Expert persists for the conversation and is visible as a chip.
+	•	Switching Experts updates the very next reply’s tone/behavior.
+
+⸻
+
+E) AI Agents: simple webhook connector for n8n
+
+Goal
+Add an easy way to connect an Atlas AI Agent to an n8n workflow via webhook, and use/test it from Atlas.
+
+Implement
+	•	Agent settings page: add Webhook URL input (blank by default).
+	•	Add a Test Agent button: sends a test payload (agent id, sample input, user id) to the webhook; show response and status.
+	•	In chat, when an Agent is selected and a webhook is configured:
+	•	Add a Send to Agent action that POSTs chat input + context to the webhook and streams back the result into the chat.
+	•	Provide minimal logs for the last N calls (status, time, duration).
+
+Acceptance
+	•	Super Admin/Admin can paste an n8n webhook URL and click Test Agent to see a live success/fail result.
+	•	In chat, Send to Agent posts to the webhook and displays the response content.
+	•	If webhook is missing/invalid, show a friendly error and skip the call.
+
+⸻
+
+F) Copy & micro-UX (use exactly)
+	•	Buttons: Save, Use in Chat, Apply to Current Chat, Start New Chat, Download, Preview, Test Agent, Connect Webhook.
+	•	Empty states:
+	•	Templates: “No templates yet. Create or import one to get started.”
+	•	Experts: “No experts available. Your admin can enable experts for this workspace.”
+	•	Agents: “No webhook connected. Paste your n8n webhook URL to test this agent.”
+	•	Errors:
+	•	“We couldn’t save these settings. Please try again.”
+	•	“This template can’t be applied right now.”
+	•	“Agent webhook failed. Check the URL and try again.”
+
+⸻
+
+G) Accessibility & performance
+	•	Ensure all actions are reachable with keyboard; visible focus states.
+	•	Label every input (aria-labels), descriptive button text (no icon-only critical actions).
+	•	Avoid layout shifts when expanding lists; prefer skeletons/spinners inside the container.
+	•	Persist user’s last expanded sidebar section per device.
+
+⸻
+
+H) QA Checklist (run after implementation)
+	1.	Project Settings modal scrolls; Save button stays visible; user text matches brand style.
+	2.	Sidebar never cuts off content; multiple sections expand without layout break; long names truncate with tooltip.
+	3.	Templates: Use in Chat (new/current) works; chip shows; download & preview work; validation triggers on reply.
+	4.	AI Experts: selectable in chat; chip shows; switching Expert changes response behavior.
+	5.	AI Agents: webhook field saves; Test Agent shows success/fail; Send to Agent in chat posts to webhook and returns content.
+	6.	Works on mobile + desktop; keyboard navigation passes.
+	7.	RBAC respected: Users can use but not edit Experts; Super Admin controls Experts and Agents.
+
+⸻
+
+I) Out-of-scope (for now)
+	•	No visual theme overhaul beyond the fixes above.
+	•	No changes to billing or auth flows.
+	•	No multi-tenant UX changes

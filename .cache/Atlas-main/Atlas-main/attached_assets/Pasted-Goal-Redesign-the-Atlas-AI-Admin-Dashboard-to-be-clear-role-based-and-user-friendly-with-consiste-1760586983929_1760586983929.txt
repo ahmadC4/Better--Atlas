@@ -1,0 +1,78 @@
+Goal
+Redesign the Atlas AI Admin Dashboard to be clear, role-based, and user friendly, with consistent backend alignment.
+
+
+
+1. Roles & Permissions
+Define 3 roles with Role-Based Access Control (RBAC):
+Super Admin
+	•	Full control of all system prompts, policies, plans, features, API access, and user management.  
+	•	Can create, edit, and delete Admins.  
+Admin
+	•	Manage Users, assign Plans, configure Features, manage Knowledge Base, and Agents.  
+	•	Can view but not edit System Prompts or Tool Policies.  
+	•	Cannot override Super Admin actions.  
+User
+	•	Limited to their own workspace: Plans, Knowledge Base, Memory, Templates, Projects.  
+	•	Can view their assigned Agents.  
+	•	No access to System Prompts, Policies, API Access, or User Management.  
+
+
+
+2. Sidebar Structure (UI Layout)
+Create a collapsible sidebar with grouped items:
+System & Policies
+	•	System Prompts  
+	•	Output Templates  
+	•	Tool Policies & Release Notes  
+Plans & Features
+	•	Plans & Models  
+	•	Knowledge Base  
+	•	Memory  
+	•	Templates & Projects  
+AI Agents
+	•	Manage Agents  
+	•	Expert Library  
+Access & Integrations
+	•	API Access  
+	•	Access Codes  
+	•	User Management  
+
+
+
+3. Role → Feature Mapping (RBAC Matrix)
+Super Admin
+- Full access to all sidebar items
+
+Admin
+- Plans & Features (all items)
+- AI Agents (all items)
+- Access & Integrations (all items except API keys)
+- System & Policies (view only)
+
+User
+- Plans & Features (only their own plan, memory, templates, projects)
+- AI Agents (view assigned agents only)
+- No access to System, Policies, API Access, or User Management
+
+
+
+
+4. Deliverables for Development
+You will:
+	1	Implement RBAC (Super Admin, Admin, User) with backend enforcement.  
+	2	Redesign Sidebar Navigation based on structure above.  
+	3	Link each sidebar item to the appropriate backend module or feature.  
+	4	Apply access filters so each role only sees what they are allowed.  
+	5	Provide breadcrumb navigation inside each section for clarity.  
+	6	Include toggle for future features (e.g., Expert Library expansions).  
+
+
+
+5. Milestones
+	1	Build RBAC backend (roles + permissions enforcement).  
+	2	Create Sidebar UI with groups.  
+	3	Map Sidebar items → role access.  
+	4	Test navigation flows (Super Admin → Admin → User).  
+	5	Add breadcrumbs & UI polish.  
+	6	Deploy for internal test, then expand.

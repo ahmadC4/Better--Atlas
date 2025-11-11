@@ -1,0 +1,83 @@
+{
+  "system-prompts": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.post": "OK",
+    "api.patch": "OK"
+  },
+  "output-templates": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.post": "OK",
+    "api.patch": "OK",
+    "api.delete": "OK"
+  },
+  "tool-policies": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.post": "OK",
+    "api.patch": "OK",
+    "api.delete": "OK"
+  },
+  "plans": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.put": "OK"
+  },
+  "knowledge-base": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.put": "OK"
+  },
+  "memory": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.put": "OK"
+  },
+  "templates-projects": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.post": "OK",
+    "api.patch": "OK",
+    "api.delete": "OK",
+    "api.put": "OK"
+  },
+  "agents": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.put": "OK"
+  },
+  "expert-library": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.post": "OK",
+    "api.patch": "OK",
+    "api.delete": "OK"
+  },
+  "api-access": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.put": "OK"
+  },
+  "access-codes": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.post": "OK",
+    "api.put": "OK",
+    "api.delete": "OK"
+  },
+  "user-management": {
+    "page": "OK",
+    "api.get": "OK",
+    "api.patch": "OK",
+    "api.post": "OK"
+  },
+  "organizations": {
+    "page": "OK",
+    "api.get": "OK"
+  },
+  "tickets": {
+    "page": "OK",
+    "api.get": "OK"
+  }
+}
