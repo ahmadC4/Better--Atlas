@@ -39,6 +39,8 @@ import APIAccessPage from "@/pages/admin/APIAccessPage";
 import AccessCodesPage from "@/pages/admin/AccessCodesPage";
 import UsersPage from "@/pages/admin/UsersPage";
 import AnalyticsPage from "@/pages/admin/AnalyticsPage";
+import OrganizationsPage from "@/pages/admin/OrganizationsPage";
+import TicketsPage from "@/pages/admin/TicketsPage";
 
 const ADMIN_ROUTES = [
   { path: "/admin", Component: DashboardPage },
@@ -56,6 +58,8 @@ const ADMIN_ROUTES = [
   { path: "/admin/api-access", Component: APIAccessPage },
   { path: "/admin/access-codes", Component: AccessCodesPage },
   { path: "/admin/users", Component: UsersPage },
+  { path: "/admin/orgs", Component: OrganizationsPage },
+  { path: "/admin/tickets", Component: TicketsPage },
   { path: "/admin/analytics", Component: AnalyticsPage },
 ] as const;
 

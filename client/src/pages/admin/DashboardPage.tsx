@@ -1,22 +1,44 @@
-import { useEffect } from 'react';
-import { Link, useLocation } from 'wouter';
-import { 
-  Settings, 
-  Package, 
-  Bot, 
-  Key, 
+import { useEffect, useMemo } from 'react';
+import { useLocation } from 'wouter';
+import {
   Users as UsersIcon,
+  Settings,
+  Package,
+  Bot,
+  Key,
   FileText,
+  Building2,
+  CreditCard,
+  Brain,
+  LifeBuoy,
   Loader2,
-  ArrowRight
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/use-permissions';
-import { ADMIN_NAV_GROUPS, PERMISSIONS } from '@shared/constants';
+import { PERMISSIONS } from '@shared/constants';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { AdminQuickLinkCard } from '@/components/admin';
+import {
+  getDashboardRoutes,
+  getRouteDashboardCard,
+  type AdminIconName,
+} from '@shared/adminRoutes';
+
+const iconComponents: Partial<Record<AdminIconName, React.ComponentType<{ className?: string }>>> = {
+  Settings,
+  Package,
+  Bot,
+  Key,
+  Users: UsersIcon,
+  FileText,
+  Building2,
+  CreditCard,
+  Brain,
+  LifeBuoy,
+};
 
 interface AdminUsersResponse {
   users: Array<{ id: string; role: string; status: string }>;
@@ -50,39 +72,29 @@ export default function DashboardPage() {
     );
   }
 
-  const visibleGroups = ADMIN_NAV_GROUPS.filter(group => 
-    hasPermission(group.requiredPermission)
-  ).map(group => ({
-    ...group,
-    items: group.items.filter(item => hasPermission(item.requiredPermission))
-  })).filter(group => group.items.length > 0);
+  const systemRoutes = useMemo(() => getDashboardRoutes('system'), []);
+  const systemCards = systemRoutes
+    .map((route) => ({ route, card: getRouteDashboardCard(route, 'system') }))
+    .filter((x) => x.card !== undefined) as Array<{
+      route: ReturnType<typeof getDashboardRoutes>[number];
+      card: NonNullable<ReturnType<typeof getRouteDashboardCard>>;
+    }>;
 
-  const firstAvailablePath = visibleGroups[0]?.items[0]?.path;
+  const iconFor = (name?: AdminIconName) => (name ? iconComponents[name] : undefined);
 
-  const userStats = usersQuery.data?.users;
-  const totalUsers = userStats?.length ?? 0;
-  const activeUsers = userStats ? userStats.filter(u => u.status === 'active').length : 0;
-  const adminUsers = userStats
-    ? userStats.filter(u => u.role === 'admin' || u.role === 'super_admin').length
-    : 0;
-
-  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-    Settings,
-    Package,
-    Bot,
-    Key,
-  };
+  const userStats = usersQuery.data?.users ?? [];
+  const totalUsers = userStats.length;
+  const activeUsers = userStats.filter((u) => u.status === 'active').length;
+  const adminUsers = userStats.filter((u) => u.role === 'admin' || u.role === 'super_admin').length;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back, {user.name || user.email}. Manage your platform settings and configurations.
-        </p>
+        <p className="text-muted-foreground">Welcome back, {user.name || user.email}.</p>
       </div>
 
-      {/* Quick Stats */}
+      {/* Quick stats */}
       {hasPermission(PERMISSIONS.USER_MANAGEMENT_VIEW) && (
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
@@ -92,9 +104,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalUsers}</div>
-              <p className="text-xs text-muted-foreground">
-                {activeUsers} active
-              </p>
+              <p className="text-xs text-muted-foreground">{activeUsers} active</p>
             </CardContent>
           </Card>
           <Card>
@@ -104,9 +114,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{adminUsers}</div>
-              <p className="text-xs text-muted-foreground">
-                Admin & Super Admin
-              </p>
+              <p className="text-xs text-muted-foreground">Admin & Super Admin</p>
             </CardContent>
           </Card>
           <Card>
@@ -124,72 +132,35 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Quick Access Cards */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Quick Access</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {visibleGroups.map((group) => {
-            const Icon = iconMap[group.icon];
-            return (
-              <Card key={group.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    {Icon && <Icon className="h-5 w-5" />}
-                    {group.label}
-                  </CardTitle>
-                  <CardDescription>
-                    {group.items.length} {group.items.length === 1 ? 'section' : 'sections'} available
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {group.items.slice(0, 3).map((item) => (
-                      <Link key={item.id} href={item.path}>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start"
-                          data-testid={`link-quick-${item.id}`}
-                        >
-                          <ArrowRight className="mr-2 h-4 w-4" />
-                          {item.label}
-                        </Button>
-                      </Link>
-                    ))}
-                    {group.items.length > 3 && (
-                      <p className="text-xs text-muted-foreground pl-2">
-                        +{group.items.length - 3} more...
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+      {/* System quick links */}
+      <section className="space-y-2">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">System</h2>
+          <p className="text-sm text-muted-foreground">Manage platform-wide policies, models, plans, and features.</p>
         </div>
-      </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {systemCards.map(({ route, card }) => (
+            <AdminQuickLinkCard
+              key={route.id}
+              title={card.title}
+              description={card.description}
+              actionLabel={card.actionLabel}
+              routeId={route.id as any}
+              icon={iconFor(card.icon) ?? Settings}
+              endpoints={route.apis.map((e) => ({ method: e.method, path: e.path }))}
+              actionTestId={`quicklink-${route.id}`}
+            />
+          ))}
+        </div>
+      </section>
 
-      {/* Getting Started for new admins */}
-      {user.role === 'admin' && (
-        <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/20">
-          <CardHeader>
-            <CardTitle>Admin Access Notice</CardTitle>
-            <CardDescription className="text-amber-800 dark:text-amber-200">
-              As an Admin, you can manage most platform settings. However, System Prompts and Tool Policies are view-only and require Super Admin privileges to edit.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      )}
-
-      {firstAvailablePath && visibleGroups.length > 0 && (
-        <div className="flex justify-center pt-4">
-          <Link href={firstAvailablePath}>
-            <Button size="lg" data-testid="button-get-started">
-              Get Started
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+      {/* Manage users CTA (uses existing endpoint) */}
+      {hasPermission(PERMISSIONS.USER_MANAGEMENT_VIEW) && (
+        <div className="flex justify-end">
+          <Button onClick={() => setLocation('/admin/users')}>Manage users</Button>
         </div>
       )}
     </div>
   );
 }
+

@@ -225,6 +225,18 @@ export const ADMIN_NAV_GROUPS = [
         path: '/admin/users',
         requiredPermission: PERMISSIONS.USER_MANAGEMENT_VIEW,
       },
+      {
+        id: 'organizations',
+        label: 'Organizations & Teams',
+        path: '/admin/orgs',
+        requiredPermission: PERMISSIONS.USER_MANAGEMENT_VIEW,
+      },
+      {
+        id: 'tickets',
+        label: 'Support Tickets',
+        path: '/admin/tickets',
+        requiredPermission: PERMISSIONS.USER_MANAGEMENT_VIEW,
+      },
     ],
   },
 ] as const;
