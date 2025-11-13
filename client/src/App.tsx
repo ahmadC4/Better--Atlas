@@ -11,6 +11,7 @@ import GoogleDrivePage from "@/pages/google-drive";
 import TeamsPage from "@/pages/teams";
 import TeamInvitationPage from "@/pages/team-invitation";
 import NotFound from "@/pages/not-found";
+import HelpPage from "@/pages/help";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import ForgotPassword from "@/pages/forgot-password";
@@ -86,6 +87,7 @@ function Router() {
     return (
       <Switch>
         <Route path="/" component={Login} />
+        <Route path="/help" component={HelpPage} />
         <Route path="/register" component={Register} />
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/reset-password" component={ResetPassword} />
@@ -102,6 +104,7 @@ function Router() {
       <Route path="/app" component={Chat} />
       <Route path="/usage" component={UsagePage} />
       <Route path="/experts" component={ExpertsPage} />
+      <Route path="/help" component={HelpPage} />
       <Route path="/templates" component={TemplatesPage} />
       <Route path="/knowledge" component={KnowledgeBase} />
       <Route path="/teams" component={TeamsPage} />

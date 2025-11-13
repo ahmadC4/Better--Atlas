@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLastAreaPreference } from '@/hooks/useLastAreaPreference';
 import { useLocation } from 'wouter';
 import {
   Card,
@@ -20,6 +21,7 @@ interface InvitationDetails {
 }
 
 export default function TeamInvitationPage() {
+  useLastAreaPreference('user');
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);

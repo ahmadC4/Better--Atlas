@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { useLastAreaPreference } from '@/hooks/useLastAreaPreference';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
   FileText,
@@ -67,6 +68,7 @@ interface KnowledgeItemWithScope extends KnowledgeItem {
 }
 
 export default function KnowledgeBase() {
+  useLastAreaPreference('user');
   const { user } = useAuth();
   const { data: capabilities } = useEffectiveCapabilities();
   const { toast } = useToast();

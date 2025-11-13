@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLastAreaPreference } from '@/hooks/useLastAreaPreference';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import {
@@ -100,6 +101,7 @@ const roleLabels = {
 };
 
 export default function TeamsPage() {
+  useLastAreaPreference('user');
   const { toast } = useToast();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
