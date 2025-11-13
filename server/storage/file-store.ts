@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { pool } from "../db.js";
 
 export interface FileWriteRequest {
   ownerId: string;
@@ -153,6 +154,135 @@ export function createFileStorage(): FileStorageAdapter {
     throw new Error("Invalid FILE_STORAGE_QUOTA_BYTES");
   }
 
-  // TODO: Wire up S3/R2 adapter when credentials are provisioned.
+  // Prefer Postgres-backed storage when a DB pool is available
+  try {
+    if (pool) {
+      return new PostgresFileStorage({ ttlMs, quotaBytes });
+    }
+  } catch {
+    // fall back to in-memory
+  }
   return new InMemoryFileStorage({ ttlMs, quotaBytes });
+}
+
+class PostgresFileStorage implements FileStorageAdapter {
+  private readonly ttlMs?: number;
+  private readonly quotaBytes?: number;
+
+  constructor(options: InMemoryFileStorageOptions = {}) {
+    this.ttlMs = options.ttlMs;
+    this.quotaBytes = options.quotaBytes;
+  }
+
+  private async getCurrentUsage(ownerId: string): Promise<number> {
+    const { rows } = await pool.query<{ total: string | null }>(
+      `select coalesce(sum(size), 0) as total
+       from stored_files
+       where owner_id = $1 and (expires_at is null or expires_at > now())`,
+      [ownerId],
+    );
+    const total = rows[0]?.total ?? "0";
+    const n = Number(total);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  async put(input: FileWriteRequest): Promise<FileRecord> {
+    // Enforce quota if configured
+    if (typeof this.quotaBytes === 'number' && Number.isFinite(this.quotaBytes)) {
+      const usage = await this.getCurrentUsage(input.ownerId);
+      if (usage + input.buffer.byteLength > this.quotaBytes) {
+        throw new FileQuotaExceededError(this.quotaBytes);
+      }
+    }
+
+    const expiresAt = typeof this.ttlMs === 'number' && Number.isFinite(this.ttlMs)
+      ? new Date(Date.now() + this.ttlMs)
+      : null;
+
+    const { rows } = await pool.query<{
+      id: string;
+      owner_id: string;
+      name: string;
+      mime_type: string;
+      size: number;
+      content: Buffer;
+      analyzed_content: string | null;
+      metadata: any;
+      created_at: Date;
+      expires_at: Date | null;
+    }>(
+      `insert into stored_files (owner_id, name, mime_type, size, content, analyzed_content, metadata, expires_at)
+       values ($1, $2, $3, $4, $5, $6, $7, $8)
+       returning id, owner_id, name, mime_type, size, content, analyzed_content, metadata, created_at, expires_at`,
+      [
+        input.ownerId,
+        input.name,
+        input.mimeType,
+        input.buffer.byteLength,
+        input.buffer,
+        input.analyzedContent ?? null,
+        input.metadata ?? null,
+        expiresAt,
+      ],
+    );
+
+    const row = rows[0];
+    return {
+      id: row.id,
+      ownerId: row.owner_id,
+      buffer: input.buffer, // Avoid re-hydrating
+      name: row.name,
+      mimeType: row.mime_type,
+      size: row.size,
+      createdAt: row.created_at,
+      expiresAt: row.expires_at ?? new Date(8640000000000000),
+      analyzedContent: row.analyzed_content ?? undefined,
+      metadata: input.metadata ?? null,
+    };
+  }
+
+  async get(id: string): Promise<FileRecord | undefined> {
+    const { rows } = await pool.query<{
+      id: string;
+      owner_id: string;
+      name: string;
+      mime_type: string;
+      size: number;
+      content: Buffer;
+      analyzed_content: string | null;
+      metadata: any;
+      created_at: Date;
+      expires_at: Date | null;
+    }>(
+      `select id, owner_id, name, mime_type, size, content, analyzed_content, metadata, created_at, expires_at
+       from stored_files where id = $1`,
+      [id],
+    );
+    const row = rows[0];
+    if (!row) return undefined;
+    if (row.expires_at && row.expires_at.getTime() <= Date.now()) {
+      // Treat expired as missing
+      return undefined;
+    }
+    return {
+      id: row.id,
+      ownerId: row.owner_id,
+      buffer: row.content,
+      name: row.name,
+      mimeType: row.mime_type,
+      size: row.size,
+      createdAt: row.created_at,
+      expiresAt: row.expires_at ?? new Date(8640000000000000),
+      analyzedContent: row.analyzed_content ?? undefined,
+      metadata: row.metadata ?? null,
+    };
+  }
+
+  async delete(id: string): Promise<void> {
+    await pool.query(`delete from stored_files where id = $1`, [id]);
+  }
+
+  async getSignedUrl(id: string): Promise<string> {
+    return `/api/files/${id}`;
+  }
 }

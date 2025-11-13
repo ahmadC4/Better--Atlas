@@ -19,7 +19,7 @@ function getPool(): Pool | null {
       connectionString: url,
       ssl: ssl as any,
       max: 1,
-      connectionTimeoutMillis: 3000,
+      connectionTimeoutMillis: 10000,
       idleTimeoutMillis: 10000,
     });
   }
