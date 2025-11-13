@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLastAreaPreference } from '@/hooks/useLastAreaPreference';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { FileText, Download, Lock, Sparkles, File, ChevronLeft } from 'lucide-react';
@@ -44,6 +45,7 @@ const OUTPUT_TEMPLATE_FORMAT_LABELS: Record<string, string> = {
 };
 
 export default function TemplatesPage() {
+  useLastAreaPreference('user');
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('documents');
