@@ -73,7 +73,7 @@ import { attachCsrfToken, verifyCsrfToken } from "./security/csrf.js";
 import { secureCompare, generateCsrfToken } from "./security/secure-compare.js";
 import { requirePermission, requireAnyPermission } from "./security/permissions.js";
 import { PERMISSIONS } from "../shared/constants.js";
-import { getModelConfig } from "./ai-models.js";
+import { getModelConfig, getDefaultModel } from "./ai-models.js";
 import { buildUsageSummary } from "./usage/analytics.js";
 import { buildOutputTemplateInstruction, validateOutputTemplateContent } from "./output-template-utils.js";
 import { MIGRATION_GUIDANCE_MESSAGE, isUndefinedTableError } from "./storage/errors.js";
@@ -3619,27 +3619,33 @@ ${file.metadata?.summary ? `\nSummary: ${file.metadata.summary}` : ''}`.trim());
   app.post('/api/chats', requireAuth, async (req, res) => {
     try {
       // Parse the chat data (excluding userId which we'll add from auth)
-      const chatData = insertChatSchema.parse(req.body);
-      const modelConfig = chatData.model ? getModelConfig(chatData.model) : undefined;
+      const parsed = insertChatSchema.parse(req.body);
+
+      // Normalize model selection with sensible fallbacks
+      let selectedModelId = parsed.model || getDefaultModel();
+      let modelConfig = getModelConfig(selectedModelId);
+
+      // If the selected model is not configured at runtime, fall back to default
+      if (!modelConfig) {
+        selectedModelId = getDefaultModel();
+        modelConfig = getModelConfig(selectedModelId);
+      }
+
+      const chatData = { ...parsed, model: selectedModelId };
       const planMeta = (req as any).resolvedPlan as ResolvedPlanMetadata | undefined;
       const isProTier = planMeta?.isProTier ?? false;
 
-      if (chatData.model) {
-        if (!modelConfig) {
-          return res.status(400).json({ error: 'Invalid model selection' });
-        }
-
-        if (!isProTier && modelConfig.provider !== 'groq') {
-          return res.status(403).json({
-            error: 'Upgrade required',
-            message: 'Free plan users can only access Groq models. Upgrade to Pro for OpenAI, Claude, and Perplexity.',
-          });
-        }
+      if (modelConfig && !isProTier && modelConfig.provider !== 'groq') {
+        return res.status(403).json({
+          error: 'Upgrade required',
+          message: 'Free plan users can only access Groq models. Upgrade to Pro for OpenAI, Claude, and Perplexity.',
+        });
       }
+
       // Ensure chat is created for the authenticated user
       const chatWithUser = {
         userId: (req as any).user.id,
-        ...chatData
+        ...chatData,
       };
       const chat = await storage.createChat(chatWithUser);
       res.json(chat);
@@ -3648,7 +3654,9 @@ ${file.metadata?.summary ? `\nSummary: ${file.metadata.summary}` : ''}`.trim());
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: 'Invalid chat data', details: error.errors });
       }
-      res.status(500).json({ error: 'Failed to create chat', detail: error instanceof Error ? error.message : undefined });
+      res
+        .status(500)
+        .json({ error: 'Failed to create chat', detail: error instanceof Error ? error.message : undefined });
     }
   });
 

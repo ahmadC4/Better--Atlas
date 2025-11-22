@@ -1,4 +1,4 @@
-import { Menu, ChevronDown, Zap, Activity, MessageSquarePlus, Users } from 'lucide-react';
+import { Menu, ChevronDown, Zap, Activity, MessageSquarePlus, Users, Workflow } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
@@ -224,6 +224,17 @@ export function ChatHeader({
       </div>
 
       <div className="flex items-center justify-end gap-1.5 sm:gap-3">
+        <Link href="/n8n">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-9 w-9 p-0 rounded-xl"
+            data-testid="button-n8n"
+            title="Open N8N"
+          >
+            <Workflow className="h-4 w-4" />
+          </Button>
+        </Link>
         <Link href="/usage">
           <Button
             variant="ghost"
