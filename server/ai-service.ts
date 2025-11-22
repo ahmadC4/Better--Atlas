@@ -52,6 +52,70 @@ export class AIService {
     openrouter: 'OpenRouter',
   };
 
+  private envVarForProvider(provider: ModelConfig['provider']): string | null {
+    switch (provider) {
+      case 'groq':
+        return process.env.GROQ_API_KEY || null;
+      case 'openai':
+        return process.env.OPENAI_API_KEY || null;
+      case 'anthropic':
+        return process.env.ANTHROPIC_API_KEY || null;
+      case 'perplexity':
+        return process.env.PERPLEXITY_API_KEY || null;
+      case 'openrouter':
+        return process.env.OPENROUTER_API_KEY || null;
+      default:
+        return null;
+    }
+  }
+
+  private async resolveModelConfig(modelId: string): Promise<ModelConfig | undefined> {
+    // Prefer static config first
+    const staticConfig = getModelConfig(modelId);
+    if (staticConfig) return staticConfig;
+
+    // Fallback to dynamic models stored in the DB
+    try {
+      const dbModel = await this.storage.getModelByModelId(modelId);
+      if (!dbModel) return undefined;
+
+      const apiKeyEnvVar = (() => {
+        switch (dbModel.provider) {
+          case 'openai':
+            return 'OPENAI_API_KEY';
+          case 'anthropic':
+            return 'ANTHROPIC_API_KEY';
+          case 'groq':
+            return 'GROQ_API_KEY';
+          case 'perplexity':
+            return 'PERPLEXITY_API_KEY';
+          case 'openrouter':
+            return 'OPENROUTER_API_KEY';
+          default:
+            return 'OPENAI_API_KEY';
+        }
+      })();
+
+      const caps: any = dbModel.capabilities ?? {};
+
+      return {
+        id: modelId,
+        apiModel: dbModel.modelId,
+        provider: dbModel.provider as ModelConfig['provider'],
+        apiKeyEnvVar,
+        maxTokens: dbModel.maxOutputTokens ?? dbModel.contextWindow ?? undefined,
+        supportsFunctions: false,
+        supportsVision: Boolean(caps.vision),
+        supportsStreaming: true,
+        supportsWebSearch: Boolean(caps.web),
+        supportsThinking: Boolean(caps.thinking),
+        supportsCodeInterpreter: Boolean(caps.code),
+      };
+    } catch (e) {
+      return undefined;
+    }
+  }
+
   private buildToolPolicyMap(policies: ToolPolicy[]): Map<string, ToolPolicy> {
     const map = new Map<string, ToolPolicy>();
     for (const policy of policies) {

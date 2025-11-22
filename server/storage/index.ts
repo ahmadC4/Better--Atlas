@@ -414,6 +414,7 @@ export interface IStorage {
   updateModel(id: string, updates: UpdateModel): Promise<Model | undefined>;
   deleteModel(id: string): Promise<boolean>;
   getAvailableModels(userId: string): Promise<Model[]>;
+  getModelByModelId(modelId: string): Promise<Model | undefined>;
 
   // Team methods
   getTeam(id: string): Promise<Team | undefined>;
@@ -2898,6 +2899,13 @@ export class MemStorage {
     return this.modelsMap.delete(id);
   }
 
+  async getModelByModelId(modelId: string): Promise<Model | undefined> {
+    for (const model of this.modelsMap.values()) {
+      if (model.modelId === modelId) return model;
+    }
+    return undefined;
+  }
+
   async getAvailableModels(userId: string): Promise<Model[]> {
     // Get user
     const user = this.users.get(userId);
@@ -4887,6 +4895,11 @@ export class DatabaseStorage implements IStorage {
 
   async getModel(id: string): Promise<Model | undefined> {
     const [result] = await db.select().from(models).where(eq(models.id, id)).limit(1);
+    return result;
+  }
+
+  async getModelByModelId(modelId: string): Promise<Model | undefined> {
+    const [result] = await db.select().from(models).where(eq(models.modelId, modelId)).limit(1);
     return result;
   }
 
