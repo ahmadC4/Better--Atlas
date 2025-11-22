@@ -3582,7 +3582,8 @@ ${file.metadata?.summary ? `\nSummary: ${file.metadata.summary}` : ''}`.trim());
   });
 
   // Get user chats
-  app.get('/api/chats/:userId', requireAuth, async (req, res) => {
+  // List chats for authenticated user (optional projectId filtering)
+  app.get('/api/chats', requireAuth, async (req, res) => {
     try {
       // Use authenticated user's ID for security
       const userId = (req as any).user.id;
@@ -3603,6 +3604,27 @@ ${file.metadata?.summary ? `\nSummary: ${file.metadata.summary}` : ''}`.trim());
         projectId = undefined; // No filter, return all
       }
       
+      const chats = await storage.getUserChats(userId, false, projectId);
+      res.json(chats);
+    } catch (error) {
+      console.error('Get chats error:', error);
+      res.status(500).json({ error: 'Failed to get chats', detail: error instanceof Error ? error.message : undefined });
+    }
+  });
+
+  // Backward-compatible route with userId param (ignored, uses auth user)
+  app.get('/api/chats/:userId', requireAuth, async (req, res) => {
+    try {
+      const userId = (req as any).user.id;
+      const projectIdParam = req.query.projectId as string | undefined;
+      let projectId: string | null | undefined;
+      if (projectIdParam === 'global') {
+        projectId = null;
+      } else if (projectIdParam) {
+        projectId = projectIdParam;
+      } else {
+        projectId = undefined;
+      }
       const chats = await storage.getUserChats(userId, false, projectId);
       res.json(chats);
     } catch (error) {

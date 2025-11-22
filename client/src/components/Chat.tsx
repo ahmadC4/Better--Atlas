@@ -66,7 +66,7 @@ export function Chat() {
     return window.innerWidth >= 768;
   });
   const [activeChat, setActiveChat] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState('compound');
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [selectedExpert, setSelectedExpert] = useState<string | null>(null);
   const [triggerKnowledgeDialog, setTriggerKnowledgeDialog] = useState(false);
   const [triggerNewProjectDialog, setTriggerNewProjectDialog] = useState(false);
@@ -234,7 +234,9 @@ export function Chat() {
   }, [isMobile]);
 
   useEffect(() => {
-    const defaultModelId = capabilities?.allowlists.models?.[0] || (plan !== 'free' ? 'gpt-5' : 'compound');
+    const defaultModelId =
+      capabilities?.allowlists.models?.[0] ||
+      (availableModels.length > 0 ? availableModels[0].id : null);
 
     if (availableModels.length === 0) {
       previousPlanRef.current = plan;
@@ -243,8 +245,8 @@ export function Chat() {
 
     const allowedIds = new Set(availableModels.map(model => model.id));
 
-    if (!allowedIds.has(selectedModel)) {
-      if (allowedIds.has(defaultModelId)) {
+    if (!selectedModel || !allowedIds.has(selectedModel)) {
+      if (defaultModelId && allowedIds.has(defaultModelId)) {
         setSelectedModel(defaultModelId);
       } else {
         setSelectedModel(availableModels[0].id);
@@ -267,24 +269,29 @@ export function Chat() {
 
   // Fetch chats for default user (only global chats, not project chats)
   const { data: chats = [], isLoading: isLoadingChats } = useQuery<Chat[]>({
-    queryKey: ['/api/chats', 'default-user'],
+    queryKey: ['/api/chats'],
     queryFn: async () => {
-      const response = await fetch('/api/chats/default-user', {
-        credentials: 'include',
-      });
+      const response = await apiRequest('GET', '/api/chats');
       if (!response.ok) {
         throw new Error('Failed to fetch chats');
       }
       return response.json();
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 
   // Fetch messages for active chat
   const { data: messages = [], isLoading: isLoadingMessages } = useQuery<Message[]>({
     queryKey: ['/api/chats', activeChat, 'messages'],
     enabled: !!activeChat,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/chats/${activeChat}/messages`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+      return response.json();
+    },
   });
 
   // Define scrollMessagesToBottom AFTER messages is declared to avoid TDZ error
@@ -349,7 +356,6 @@ export function Chat() {
   const createChatMutation = useMutation({
     mutationFn: async (data: { title: string; model: string; projectId?: string | null }) => {
       const response = await apiRequest('POST', '/api/chats', {
-        userId: 'default-user', // In a real app, this would come from auth
         title: data.title,
         model: data.model,
         projectId: data.projectId ?? undefined,
@@ -357,7 +363,7 @@ export function Chat() {
       return response.json();
     },
     onSuccess: (newChat) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/chats', 'default-user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/chats'] });
       setActiveChat(newChat.id);
       toast({
         title: 'New chat created',
@@ -380,7 +386,7 @@ export function Chat() {
       await apiRequest('PATCH', `/api/chats/${chatId}/archive`);
     },
     onSuccess: (_, archivedChatId) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/chats', 'default-user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/chats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/chats/archived'] });
       if (activeChat === archivedChatId) {
         setActiveChat(null);
@@ -405,7 +411,7 @@ export function Chat() {
       await apiRequest('DELETE', `/api/chats/${chatId}`);
     },
     onSuccess: (_, deletedChatId) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/chats', 'default-user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/chats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/chats/archived'] });
       if (activeChat === deletedChatId) {
         setActiveChat(null);
@@ -448,7 +454,6 @@ export function Chat() {
           { role: 'user' as const, content: data.content }
         ],
         chatId: data.chatId,
-        userId: 'default-user',
         expertId: data.expertId,
         attachments: data.attachments,
         metadata: data.metadata,
