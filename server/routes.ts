@@ -2310,12 +2310,8 @@ ${file.metadata?.summary ? `\nSummary: ${file.metadata.summary}` : ''}`.trim());
     try {
       const models = await storage.getAvailableModels(user.id);
 
-      // Only expose providers that have a platform API key configured,
-      // and that have a corresponding runtime model configuration.
+      // Only expose providers that have a platform API key configured
       const filtered = models.filter((model) => {
-        const hasConfig = Boolean(getModelConfig(model.modelId));
-        if (!hasConfig) return false;
-
         switch (model.provider) {
           case 'openai':
             return Boolean(process.env.OPENAI_API_KEY);
@@ -3618,6 +3614,9 @@ ${file.metadata?.summary ? `\nSummary: ${file.metadata.summary}` : ''}`.trim());
   // Create new chat
   app.post('/api/chats', requireAuth, async (req, res) => {
     try {
+      const user = req.user as User;
+      const isAdminRole = user?.role === 'admin' || user?.role === 'super_admin';
+
       // Parse the chat data (excluding userId which we'll add from auth)
       const parsed = insertChatSchema.parse(req.body);
 
@@ -3635,7 +3634,7 @@ ${file.metadata?.summary ? `\nSummary: ${file.metadata.summary}` : ''}`.trim());
       const planMeta = (req as any).resolvedPlan as ResolvedPlanMetadata | undefined;
       const isProTier = planMeta?.isProTier ?? false;
 
-      if (modelConfig && !isProTier && modelConfig.provider !== 'groq') {
+      if (!isAdminRole && modelConfig && !isProTier && modelConfig.provider !== 'groq') {
         return res.status(403).json({
           error: 'Upgrade required',
           message: 'Free plan users can only access Groq models. Upgrade to Pro for OpenAI, Claude, and Perplexity.',

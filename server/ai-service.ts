@@ -423,7 +423,7 @@ export class AIService {
   }
   
   async getChatCompletion(request: ChatCompletionRequest): Promise<ChatCompletionResponse> {
-    const modelConfig = getModelConfig(request.model);
+    const modelConfig = await this.resolveModelConfig(request.model);
     
     if (!modelConfig) {
       throw new Error(`Model ${request.model} not found`);
@@ -1114,7 +1114,7 @@ sys.stderr = _stderr
   
   // Stream completion for real-time responses
   async *streamChatCompletion(request: ChatCompletionRequest): AsyncGenerator<string> {
-    const modelConfig = getModelConfig(request.model);
+    const modelConfig = await this.resolveModelConfig(request.model);
     
     if (!modelConfig) {
       throw new Error(`Model ${request.model} not found`);
