@@ -42,6 +42,7 @@ import UsersPage from "@/pages/admin/UsersPage";
 import AnalyticsPage from "@/pages/admin/AnalyticsPage";
 import OrganizationsPage from "@/pages/admin/OrganizationsPage";
 import TicketsPage from "@/pages/admin/TicketsPage";
+import N8NPage from "@/pages/n8n";
 
 const ADMIN_ROUTES = [
   { path: "/admin", Component: DashboardPage },
@@ -110,6 +111,7 @@ function Router() {
       <Route path="/teams" component={TeamsPage} />
       <Route path="/team-invitation" component={TeamInvitationPage} />
       <Route path="/google-drive" component={GoogleDrivePage} />
+      <Route path="/n8n" component={N8NPage} />
       
       {/* Admin Routes - Wrapped in AdminLayout */}
       {ADMIN_ROUTES.map(({ path, Component }) => (

@@ -29,12 +29,13 @@ interface ChatHeaderProps {
   capabilityNotice?: string | null;
 }
 
-const providerOrder: ModelProvider[] = ['OpenAI', 'Anthropic', 'Groq', 'Perplexity'];
+const providerOrder: ModelProvider[] = ['openai', 'anthropic', 'groq', 'perplexity', 'openrouter'];
 const providerLabels: Record<ModelProvider, string> = {
-  OpenAI: 'OpenAI',
-  Anthropic: 'Claude',
-  Groq: 'Groq',
-  Perplexity: 'Perplexity',
+  openai: 'OpenAI',
+  anthropic: 'Claude',
+  groq: 'Groq',
+  perplexity: 'Perplexity',
+  openrouter: 'OpenRouter',
 };
 
 export function ChatHeader({

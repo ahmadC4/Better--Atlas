@@ -20,7 +20,7 @@ import {
   canUseTemplates 
 } from '@/hooks/use-effective-capabilities';
 import { Button } from '@/components/ui/button';
-import { getChatCapableModels, type Chat, type Message, type Attachment, type AIModel, type ApiProvider, getModelById } from '@shared/schema';
+import { getChatCapableModels, type Chat, type Message, type Attachment, type AIModel, type ApiProvider, getModelById, type ModelProvider } from '@shared/schema';
 
 interface FileAttachment {
   id: string;
@@ -170,10 +170,18 @@ export function Chat() {
   const availableModels: AIModel[] = useMemo(() => {
     // If models are fetched from API, use them
     if (modelsApiData?.models && modelsApiData.models.length > 0) {
+      const providerLabelMap: Record<string, ModelProvider> = {
+        openai: 'openai',
+        anthropic: 'anthropic',
+        groq: 'groq',
+        perplexity: 'perplexity',
+        openrouter: 'openrouter',
+      };
+
       return modelsApiData.models.map((model: any) => ({
         id: model.modelId,
         name: model.displayName,
-        provider: model.provider.charAt(0).toUpperCase() + model.provider.slice(1) as 'OpenAI' | 'Anthropic' | 'Groq' | 'Perplexity',
+        provider: providerLabelMap[model.provider] ?? model.provider,
         contextLimit: model.contextWindow || 8192,
         maxOutput: model.maxOutputTokens || 4096,
         status: model.isActive ? 'current' : 'legacy' as 'current' | 'legacy',

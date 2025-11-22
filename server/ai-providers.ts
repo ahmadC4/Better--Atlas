@@ -391,6 +391,62 @@ export async function callPerplexity(request: ChatCompletionRequest): Promise<Ch
   }
 }
 
+// OpenRouter provider
+export async function callOpenRouter(request: ChatCompletionRequest): Promise<ChatCompletionResponse> {
+  try {
+    const modelConfig = getModelConfig(request.model);
+    if (!modelConfig || modelConfig.provider !== 'openrouter') {
+      throw new Error(`Unsupported OpenRouter model: ${request.model}`);
+    }
+
+    if (!process.env.OPENROUTER_API_KEY) {
+      throw new Error('OpenRouter API key is required but not configured');
+    }
+
+    const openRouterEndpoint = modelConfig.endpoint || 'https://openrouter.ai/api/v1/chat/completions';
+
+    const cleanMessages = request.messages.map(m => ({ role: m.role, content: m.content }));
+
+    const response = await fetch(openRouterEndpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        // Optional but recommended metadata headers
+        'X-Title': 'Atlas AI',
+      },
+      body: JSON.stringify({
+        model: modelConfig.apiModel,
+        messages: cleanMessages,
+        max_tokens: sanitizeMaxTokens(request.model, request.maxTokens),
+        temperature: request.temperature ?? 0.7,
+        stream: false,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`OpenRouter API ${response.status} error response:`, errorText);
+      throw new Error(`OpenRouter API error: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    return {
+      content: data.choices?.[0]?.message?.content || '',
+      model: request.model,
+      usage: {
+        promptTokens: data.usage?.prompt_tokens,
+        completionTokens: data.usage?.completion_tokens,
+        totalTokens: data.usage?.total_tokens,
+      },
+    };
+  } catch (error) {
+    console.error('OpenRouter API error:', error);
+    throw new Error(`OpenRouter API error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
 // Environment variable validation
 function validateEnvironmentVariables() {
   const missing = [];
@@ -398,6 +454,7 @@ function validateEnvironmentVariables() {
   if (!process.env.OPENAI_API_KEY) missing.push('OPENAI_API_KEY');
   if (!process.env.ANTHROPIC_API_KEY) missing.push('ANTHROPIC_API_KEY');
   if (!process.env.PERPLEXITY_API_KEY) missing.push('PERPLEXITY_API_KEY');
+  if (!process.env.OPENROUTER_API_KEY) missing.push('OPENROUTER_API_KEY');
   // Note: GROQ_API_KEY is optional since Groq models may not be fully available
   
   if (missing.length > 0) {
@@ -461,6 +518,11 @@ export async function callAIProvider(request: ChatCompletionRequest): Promise<Ch
         throw new Error('Perplexity API key is required but not configured');
       }
       return callPerplexity(validatedRequest);
+    case 'openrouter':
+      if (!process.env.OPENROUTER_API_KEY) {
+        throw new Error('OpenRouter API key is required but not configured');
+      }
+      return callOpenRouter(validatedRequest);
     default:
       throw new Error(`Unsupported provider: ${model.provider}`);
   }

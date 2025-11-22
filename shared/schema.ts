@@ -287,16 +287,16 @@ export const outputTemplateValidationSchema = z.object({
   checkedAt: z.string().datetime({ offset: true }),
 });
 
-export const platformSettings = pgTable("platform_settings", {
+  export const platformSettings = pgTable("platform_settings", {
   id: varchar("id").primaryKey(),
   data: jsonb("data").$type<z.infer<typeof platformSettingsDataSchema>>().notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const TOOL_POLICY_PROVIDERS = ['openai', 'anthropic', 'groq', 'perplexity'] as const;
-export const toolPolicyProviderSchema = z.enum(TOOL_POLICY_PROVIDERS);
-export type ToolPolicyProvider = z.infer<typeof toolPolicyProviderSchema>;
+  export const TOOL_POLICY_PROVIDERS = ['openai', 'anthropic', 'groq', 'perplexity', 'openrouter'] as const;
+  export const toolPolicyProviderSchema = z.enum(TOOL_POLICY_PROVIDERS);
+  export type ToolPolicyProvider = z.infer<typeof toolPolicyProviderSchema>;
 
 export const toolPolicyToolNameSchema = z
   .string()
@@ -710,6 +710,14 @@ export const defaultPlatformSettings: z.infer<typeof platformSettingsDataSchema>
       dailyRequestLimit: null,
       platformKeyAllowedModels: [],
     },
+    openrouter: {
+      enabled: true,
+      defaultApiKey: null,
+      allowUserProvidedKeys: true,
+      allowedModels: [],
+      dailyRequestLimit: null,
+      platformKeyAllowedModels: [],
+    },
     n8n: {
       enabled: true,
       defaultApiKey: null,
@@ -1006,7 +1014,7 @@ export const adminAuditLogs = pgTable("admin_audit_logs", {
 ]);
 
 // Models catalog for platform-wide AI model management
-export const modelProviderSchema = z.enum(['groq', 'openai', 'anthropic', 'perplexity']);
+export const modelProviderSchema = z.enum(['groq', 'openai', 'anthropic', 'perplexity', 'openrouter']);
 export type ModelProvider = z.infer<typeof modelProviderSchema>;
 
 export const modelCapabilitiesSchema = z.object({
@@ -1290,7 +1298,7 @@ export const messageMetadataSchema = z.object({
 
 export type MessageMetadata = z.infer<typeof messageMetadataSchema>;
 
-export const apiProviderSchema = z.enum(['openai', 'anthropic', 'groq', 'perplexity', 'n8n', 'notion']);
+export const apiProviderSchema = z.enum(['openai', 'anthropic', 'groq', 'perplexity', 'openrouter', 'n8n', 'notion']);
 export type ApiProvider = z.infer<typeof apiProviderSchema>;
 
 // AI Model Configuration

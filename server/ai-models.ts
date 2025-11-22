@@ -4,7 +4,7 @@
 export interface ModelConfig {
   id: string;
   apiModel: string; // Actual model name for API calls
-  provider: 'openai' | 'anthropic' | 'groq' | 'perplexity';
+  provider: 'openai' | 'anthropic' | 'groq' | 'perplexity' | 'openrouter';
   apiKeyEnvVar: string;
   endpoint?: string; // Optional custom endpoint
   maxTokens?: number;
@@ -141,6 +141,36 @@ export const MODEL_CONFIG: Record<string, ModelConfig> = {
     supportsStreaming: true,
     supportsWebSearch: true,
     supportsThinking: false,
+    supportsCodeInterpreter: false,
+  },
+
+  // OpenRouter virtual models (routed through OpenRouter API)
+  'openrouter-auto': {
+    id: 'openrouter-auto',
+    // Route to a strong general-purpose model on OpenRouter
+    apiModel: 'openai/gpt-4.1-mini',
+    provider: 'openrouter',
+    apiKeyEnvVar: 'OPENROUTER_API_KEY',
+    maxTokens: 128000,
+    supportsFunctions: true,
+    supportsVision: true,
+    supportsStreaming: true,
+    supportsWebSearch: true,
+    supportsThinking: false,
+    supportsCodeInterpreter: true,
+  },
+  'openrouter-deep-research': {
+    id: 'openrouter-deep-research',
+    // Route to a thinking + web-search capable model
+    apiModel: 'perplexity/sonar-reasoning',
+    provider: 'openrouter',
+    apiKeyEnvVar: 'OPENROUTER_API_KEY',
+    maxTokens: 32768,
+    supportsFunctions: false,
+    supportsVision: false,
+    supportsStreaming: true,
+    supportsWebSearch: true,
+    supportsThinking: true,
     supportsCodeInterpreter: false,
   },
 };

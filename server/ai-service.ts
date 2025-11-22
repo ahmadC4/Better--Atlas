@@ -49,6 +49,7 @@ export class AIService {
     anthropic: 'Claude',
     groq: 'Groq',
     perplexity: 'Perplexity',
+    openrouter: 'OpenRouter',
   };
 
   private buildToolPolicyMap(policies: ToolPolicy[]): Map<string, ToolPolicy> {
@@ -168,6 +169,8 @@ export class AIService {
         return process.env.ANTHROPIC_API_KEY || null;
       case 'perplexity':
         return process.env.PERPLEXITY_API_KEY || null;
+      case 'openrouter':
+        return process.env.OPENROUTER_API_KEY || null;
       default:
         return null;
     }
@@ -426,6 +429,10 @@ export class AIService {
 
       case 'perplexity':
         return this.getPerplexityCompletion(messagesWithToolPolicies, modelConfig, request, apiKey, toolPolicyMap);
+
+      case 'openrouter':
+        // OpenRouter uses the same OpenAI-compatible chat completion format via its own endpoint.
+        return this.getOpenAICompletion(messagesWithToolPolicies, modelConfig, request, autonomousCodeExecution, apiKey, toolPolicyMap);
 
       default:
         throw new Error(`Provider ${modelConfig.provider} not implemented`);

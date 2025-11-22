@@ -227,6 +227,47 @@ const modelData: InsertModel[] = [
     maxOutputTokens: 4096,
     isActive: true,
   },
+  // OpenRouter virtual models (routed through OpenRouter API; see server/ai-models.ts)
+  {
+    provider: "openrouter",
+    modelId: "openrouter-auto",
+    displayName: "OpenRouter (Auto)",
+    description: "Routes through OpenRouter to a strong general-purpose chat model.",
+    capabilities: {
+      code: true,
+      web: true,
+      vision: true,
+      audio: false,
+      streaming: true,
+    },
+    basePricing: {
+      input_per_1k_usd: 0.0,
+      output_per_1k_usd: 0.0,
+    },
+    contextWindow: 128000,
+    maxOutputTokens: 16384,
+    isActive: true,
+  },
+  {
+    provider: "openrouter",
+    modelId: "openrouter-deep-research",
+    displayName: "OpenRouter Deep Research",
+    description: "OpenRouter-backed research model with web search and extended reasoning.",
+    capabilities: {
+      code: false,
+      web: true,
+      vision: false,
+      audio: false,
+      streaming: true,
+    },
+    basePricing: {
+      input_per_1k_usd: 0.0,
+      output_per_1k_usd: 0.0,
+    },
+    contextWindow: 32768,
+    maxOutputTokens: 8192,
+    isActive: true,
+  },
 ];
 
 async function seedModels() {
