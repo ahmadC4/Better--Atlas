@@ -169,6 +169,38 @@ const ADMIN_ROUTE_CATALOG: Record<string, AdminRouteDefinition> = {
       },
     },
   },
+  'assistant-library': {
+    id: 'assistant-library',
+    label: 'Assistant Library',
+    path: '/admin/assistants',
+    requiredPermission: PERMISSIONS.ASSISTANT_LIBRARY_VIEW,
+    apis: [
+      { method: 'GET', path: '/api/admin/assistants' },
+      { method: 'POST', path: '/api/admin/assistants' },
+      { method: 'PATCH', path: '/api/admin/assistants/:id' },
+      { method: 'DELETE', path: '/api/admin/assistants/:id' },
+      { method: 'GET', path: '/api/admin/assistant-metrics' },
+    ],
+    groupId: 'plans-features',
+    pageHeader: {
+      title: 'Assistant Library',
+      description: 'Publish prompt or webhook-based assistants for your organization.',
+    },
+    dashboardCards: {
+      system: {
+        title: 'Assistant Library',
+        description: 'Curate assistants that your teams can activate in chat.',
+        actionLabel: 'Manage assistants',
+        icon: 'Bot',
+      },
+      workspace: {
+        title: 'Assistant Library',
+        description: 'Review which assistants are published and active across teams.',
+        actionLabel: 'Review assistants',
+        icon: 'Bot',
+      },
+    },
+  },
   'knowledge-base': {
     id: 'knowledge-base',
     label: 'Knowledge Base',
@@ -390,7 +422,7 @@ export const ADMIN_ROUTE_GROUPS: readonly AdminRouteGroupDefinition[] = [
     label: 'Plans & Features',
     icon: 'Package',
     requiredPermission: PERMISSIONS.PLANS_VIEW,
-    routeIds: ['plans', 'knowledge-base', 'memory', 'templates-projects'],
+    routeIds: ['plans', 'knowledge-base', 'memory', 'templates-projects', 'assistant-library'],
   },
   {
     id: 'ai-agents',

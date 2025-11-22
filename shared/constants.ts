@@ -40,6 +40,8 @@ export const PERMISSIONS = {
   TEMPLATES_EDIT: 'templates:edit',
   PROJECTS_VIEW: 'projects:view',
   PROJECTS_EDIT: 'projects:edit',
+  ASSISTANT_LIBRARY_VIEW: 'assistant_library:view',
+  ASSISTANT_LIBRARY_EDIT: 'assistant_library:edit',
   
   // AI Agents
   AGENTS_VIEW: 'agents:view',
@@ -80,6 +82,8 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.TEMPLATES_EDIT,
     PERMISSIONS.PROJECTS_VIEW,
     PERMISSIONS.PROJECTS_EDIT,
+    PERMISSIONS.ASSISTANT_LIBRARY_VIEW,
+    PERMISSIONS.ASSISTANT_LIBRARY_EDIT,
     
     // AI Agents (full access)
     PERMISSIONS.AGENTS_VIEW,
