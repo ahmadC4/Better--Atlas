@@ -2309,8 +2309,31 @@ ${file.metadata?.summary ? `\nSummary: ${file.metadata.summary}` : ''}`.trim());
     const user = req.user as User;
     try {
       const models = await storage.getAvailableModels(user.id);
-      res.json({ 
-        models: models.map(model => ({
+
+      // Only expose providers that have a platform API key configured,
+      // and that have a corresponding runtime model configuration.
+      const filtered = models.filter((model) => {
+        const hasConfig = Boolean(getModelConfig(model.modelId));
+        if (!hasConfig) return false;
+
+        switch (model.provider) {
+          case 'openai':
+            return Boolean(process.env.OPENAI_API_KEY);
+          case 'anthropic':
+            return Boolean(process.env.ANTHROPIC_API_KEY);
+          case 'groq':
+            return Boolean(process.env.GROQ_API_KEY);
+          case 'perplexity':
+            return Boolean(process.env.PERPLEXITY_API_KEY);
+          case 'openrouter':
+            return Boolean(process.env.OPENROUTER_API_KEY);
+          default:
+            return true;
+        }
+      });
+
+      res.json({
+        models: filtered.map((model) => ({
           id: model.id,
           provider: model.provider,
           modelId: model.modelId,
@@ -2321,11 +2344,13 @@ ${file.metadata?.summary ? `\nSummary: ${file.metadata.summary}` : ''}`.trim());
           contextWindow: model.contextWindow,
           maxOutputTokens: model.maxOutputTokens,
           isActive: model.isActive,
-        }))
+        })),
       });
     } catch (error) {
       console.error('Failed to fetch available models:', error);
-      res.status(500).json({ error: 'Unable to fetch models', detail: error instanceof Error ? error.message : undefined });
+      res
+        .status(500)
+        .json({ error: 'Unable to fetch models', detail: error instanceof Error ? error.message : undefined });
     }
   });
 
